@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Minesweeper.Core.Enums
 {
-    internal enum GameStatus
+    public enum GameStatus
     {
+        Stoped,
+        InProgress,
+        Win,
+        Loose
     }
 }
