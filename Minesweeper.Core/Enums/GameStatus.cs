@@ -8,9 +8,10 @@ namespace Minesweeper.Core.Enums
 {
     public enum GameStatus
     {
-        Stoped,
-        InProgress,
-        Win,
-        Loose
+        Created, // Игра создана, но не начата
+        InProgress, // Игра в процессе
+        Paused, // Игра приостановлена
+        Win, // Игра выиграна
+        Loose // Игра проиграна
     }
 }
