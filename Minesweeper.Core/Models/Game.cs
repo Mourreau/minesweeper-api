@@ -15,6 +15,8 @@ namespace Minesweeper.Core.Models
         /// Поле с ячейками, генерируется при старте игры
         /// </summary>
         public Board GameBoard { get; private set; }
+        
+        public GameSettings Settings { get; private set; }
 
         public Game(GameSettings settings)
         {

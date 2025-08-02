@@ -127,5 +127,46 @@ namespace Minesweeper.Tests.Models
 
             Assert.Equal(expectedExceptionMessage, actualMessage.Message);
         }
+        
+        [Fact]
+        public void CountMinesAroundCell_ShouldReturnRightNumberOfAdjacentMines_OfNotEdgeCell()
+        {
+            int expectedAdjacentMinesCount = 4;
+            
+            Board testBoard = new Board(10, 10);
+            Cell startingCell = testBoard.GetCell(5, 5);
+            Cell searchingCell = testBoard.GetCell(2, 2);
+            
+            testBoard.GameBoard[1, 1].IsMine = true;
+            testBoard.GameBoard[3, 3].IsMine = true;
+            testBoard.GameBoard[1, 2].IsMine = true;
+            testBoard.GameBoard[3, 2].IsMine = true;
+            
+            testBoard.CountMinesAroundCell(searchingCell);
+
+
+            int actualAdjacentMinesCount = searchingCell.AdjacentMinesCount;
+            Assert.Equal(expectedAdjacentMinesCount, actualAdjacentMinesCount);
+        }
+        
+        [Fact]
+        public void CountMinesAroundCell_ShouldReturnRightNumberOfAdjacentMines_OfEdgeCell()
+        {
+            int expectedAdjacentMinesCount = 3;
+            
+            Board testBoard = new Board(10, 10);
+            Cell startingCell = testBoard.GetCell(5, 5);
+            Cell searchingCell = testBoard.GetCell(0, 0);
+            
+            testBoard.GameBoard[0, 1].IsMine = true;
+            testBoard.GameBoard[1, 1].IsMine = true;
+            testBoard.GameBoard[1, 0].IsMine = true;
+            
+            testBoard.CountMinesAroundCell(searchingCell);
+
+
+            int actualAdjacentMinesCount = searchingCell.AdjacentMinesCount;
+            Assert.Equal(expectedAdjacentMinesCount, actualAdjacentMinesCount);
+        }
     }
 }
