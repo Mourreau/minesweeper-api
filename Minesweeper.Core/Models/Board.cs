@@ -66,6 +66,18 @@
             return GameBoard[x, y];
         }
 
+        public bool TryGetCell(int x, int y, out Cell cell)
+        {
+            if (x < 0 || y < 0 || x >= Width || y >= Height)
+            {
+                cell = default!;
+                return false;
+            }
+
+            cell = GameBoard[x, y];
+            return true;
+        }
+
         /// <summary>
         /// Генерация позиций мин на игровом поле
         /// </summary>
@@ -102,7 +114,7 @@
 
 
         /// <summary>
-        /// Проверка находится ли клетка в "Безопасной" зоне стартовой клетки.
+        /// Проверка находится ли клетка в "Безопасной" зоне стартовой клетки. Для защиты от авто-поражения на первых ходах
         /// </summary>
         /// <param name="selectedCell"></param>
         /// <param name="startedCell"></param>
@@ -122,14 +134,15 @@
                 {
                     Cell searchingCell = GetCell(x, y);
 
-                    CountMinesAroundCell(searchingCell);
+                    CalculateMinesAroundCell(searchingCell);
                 }
             }
         }
 
-        public void CountMinesAroundCell(Cell searchingCell)
+        public void CalculateMinesAroundCell(Cell searchingCell)
         {
             searchingCell.AdjacentMinesCount = 0;
+
             for (int i = -1; i <= 1; i++)
             {
                 for (int j = -1; j <= 1; j++)
@@ -155,6 +168,85 @@
             positionCell = GameBoard[tryX, tryY];
             return true;
         }
+
+        /// <summary>
+        /// Открыть закрытую клетку.
+        /// </summary>
+        /// <param name="cell">Клетка, которую нужно открыть</param>
+        /// <returns>Возвращает true если получилось открыть клетку</returns>
+        public bool TryOpenCell(Cell cell)
+        {
+            if (cell.IsFlagged || cell.IsRevealed)
+                return false;
+
+            cell.IsRevealed = true;
+            return true;
+        }
+
+        /// <summary>
+        /// Поставить флаг на клетку.
+        /// </summary>
+        /// <param name="cell">Кетка на которую будет установлен флаг.</param>
+        /// <returns>Возвращает true если флаг установлен.</returns>
+        public bool TryToggleFlag(Cell cell)
+        {
+            if (cell.IsRevealed)
+                return false;
+
+            cell.IsFlagged = !cell.IsFlagged;
+            return true;
+        }
+
+        public IEnumerable<Cell> GetAdjacentCells(Cell cell)
+        {
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 && y == 0) continue;
+                    
+                    if (!TryGetCell(cell.X + x, cell.Y + y, out Cell adjacentCell)) continue;
+
+                    yield return adjacentCell;
+                }
+            }
+        }
+
+        public void RevealAdjacentNotMineCells(Cell startedCell)
+        {
+            Queue<Cell> openQueue = new Queue<Cell>();
+            HashSet<Cell> visitedCells = new HashSet<Cell>();
+
+            void EnqueueIfNotVisited(Cell cell)
+            {
+                if (visitedCells.Add(cell)) // Add вернёт true, если действительно добавился
+                {
+                    openQueue.Enqueue(cell);
+                }
+            }
+            
+            openQueue.Enqueue(startedCell);
+
+            while (openQueue.Count > 0)
+            {
+                var openCell = openQueue.Dequeue();
+                
+                if (openCell.IsMine) continue;
+                
+                if (!visitedCells.Add(openCell)) continue;
+
+                TryOpenCell(openCell);
+
+                if (openCell.AdjacentMinesCount == 0)
+                {
+                    List<Cell> adjacentCells = GetAdjacentCells(openCell).ToList();
+                    foreach (Cell adjacentCell in adjacentCells)
+                    {
+                        EnqueueIfNotVisited(adjacentCell);
+                    }
+                }
+            }
+        }
     }
 }
 // Добавить проверку для счетчика соседних мин - если клетка находится у края, то проверять все 8 клеток вокруг нее не нужно
@@ -162,4 +254,3 @@
 // Сейчас мина не ставится только на первую клетку, но не исключается, что рядом всё заминировано, и у игрока будет автопоражение на 2 - 3 ходу
 // Позже можешь расширить:
 // Генерация мин с исключением startedCell и всех её соседей
-// Пока не нужно — просто запомни как идею для улучшения UX.
