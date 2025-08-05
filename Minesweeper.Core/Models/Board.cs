@@ -212,6 +212,10 @@
             }
         }
 
+        /// <summary>
+        /// Открывает все клетки, что не являются минами, которые граничат с открытой клеткой
+        /// </summary>
+        /// <param name="startedCell">Нажатая игроком клетка</param>
         public void RevealAdjacentNotMineCells(Cell startedCell)
         {
             Queue<Cell> openQueue = new Queue<Cell>();
@@ -219,7 +223,7 @@
 
             void EnqueueIfNotVisited(Cell cell)
             {
-                if (visitedCells.Add(cell)) // Add вернёт true, если действительно добавился
+                if (!visitedCells.Contains(cell)) // Add вернёт true, если действительно добавился
                 {
                     openQueue.Enqueue(cell);
                 }
@@ -231,18 +235,18 @@
             {
                 var openCell = openQueue.Dequeue();
                 
-                if (openCell.IsMine) continue;
+                if (openCell.IsMine) continue; // Если мина, начать сначала
                 
-                if (!visitedCells.Add(openCell)) continue;
+                if (!visitedCells.Add(openCell)) continue; // Если клетка уже есть в списке открытых, начать сначала
 
-                TryOpenCell(openCell);
-
-                if (openCell.AdjacentMinesCount == 0)
+                if (!TryOpenCell(openCell)) continue; // Если клетку не получилось открыть - начать сначала
+                
+                if (openCell.AdjacentMinesCount == 0) // Если у клетки нет соседей-мин, то...
                 {
-                    List<Cell> adjacentCells = GetAdjacentCells(openCell).ToList();
-                    foreach (Cell adjacentCell in adjacentCells)
+                    List<Cell> adjacentCells = GetAdjacentCells(openCell).ToList(); // Собираем всех соседей клетки в список
+                    foreach (Cell adjacentCell in adjacentCells) // Для каждого соседа...
                     {
-                        EnqueueIfNotVisited(adjacentCell);
+                        EnqueueIfNotVisited(adjacentCell); // Если не открывалась, то добавляем в очередь на открытие
                     }
                 }
             }
