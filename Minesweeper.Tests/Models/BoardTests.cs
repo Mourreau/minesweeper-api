@@ -129,7 +129,7 @@ namespace Minesweeper.Tests.Models
         }
         
         [Fact]
-        public void CountMinesAroundCell_ShouldReturnRightNumberOfAdjacentMines_OfNotEdgeCell()
+        public void CountMinesAroundCell_ShouldReturnCorrectNumberOfAdjacentMines_OfNotEdgeCell()
         {
             int expectedAdjacentMinesCount = 4;
             
@@ -142,7 +142,7 @@ namespace Minesweeper.Tests.Models
             testBoard.GameBoard[1, 2].IsMine = true;
             testBoard.GameBoard[3, 2].IsMine = true;
             
-            testBoard.CountMinesAroundCell(searchingCell);
+            testBoard.CalculateMinesAroundCell(searchingCell);
 
 
             int actualAdjacentMinesCount = searchingCell.AdjacentMinesCount;
@@ -150,7 +150,7 @@ namespace Minesweeper.Tests.Models
         }
         
         [Fact]
-        public void CountMinesAroundCell_ShouldReturnRightNumberOfAdjacentMines_OfEdgeCell()
+        public void CountMinesAroundCell_ShouldReturnCorrectNumberOfAdjacentMines_OfEdgeCell()
         {
             int expectedAdjacentMinesCount = 3;
             
@@ -162,11 +162,50 @@ namespace Minesweeper.Tests.Models
             testBoard.GameBoard[1, 1].IsMine = true;
             testBoard.GameBoard[1, 0].IsMine = true;
             
-            testBoard.CountMinesAroundCell(searchingCell);
+            testBoard.CalculateMinesAroundCell(searchingCell);
 
 
             int actualAdjacentMinesCount = searchingCell.AdjacentMinesCount;
             Assert.Equal(expectedAdjacentMinesCount, actualAdjacentMinesCount);
+        }
+        
+        [Fact]
+        public void RevealAdjacentNotMineCells_ShouldReturnTrue_WhenOpenedCorrectly()
+        {
+            Board testBoard = new Board(4, 4);
+            List<Cell> mines = new List<Cell>();
+            mines.Add(testBoard.GetCell(2, 0));
+            mines.Add(testBoard.GetCell(3, 1));
+            mines.Add(testBoard.GetCell(2, 2));
+
+            foreach (Cell mine in mines)
+                mine.IsMine = true;
+            
+            List<Cell> expectedOpenedCells = new List<Cell>
+            {
+                testBoard.GetCell(0, 0),
+                testBoard.GetCell(0, 1),
+                testBoard.GetCell(0, 2),
+                testBoard.GetCell(0, 3),
+                testBoard.GetCell(1, 0),
+                testBoard.GetCell(1, 1),
+                testBoard.GetCell(1, 2),
+                testBoard.GetCell(1, 3)
+            };
+            
+            testBoard.CalculateAdjacentMinesAtBoard();
+            
+            testBoard.RevealAdjacentNotMineCells(testBoard.GetCell(0, 0));
+            
+            List<Cell> actualOpenedCells = new();
+            foreach (Cell cell in testBoard.GameBoard)
+            {
+                if (cell.IsRevealed)
+                    actualOpenedCells.Add(cell);
+            }
+            
+            Assert.Equal(expectedOpenedCells.Count, actualOpenedCells.Count);
+            
         }
     }
 }
