@@ -1,4 +1,6 @@
-﻿namespace Minesweeper.Core.Models
+﻿using Minesweeper.Core.Settings;
+
+namespace Minesweeper.Core.Models
 {
     public class Board
     {
@@ -17,6 +19,8 @@
         /// </summary>
         private int Height => GameBoard.GetLength(1);
 
+        public int OpenedCells { get; private set; }
+        
         public Board(int boardWidth, int boardHeight)
         {
             GameBoard = GenerateBoard(boardWidth, boardHeight);
@@ -240,6 +244,8 @@
                 if (!visitedCells.Add(openCell)) continue; // Если клетка уже есть в списке открытых, начать сначала
 
                 if (!TryOpenCell(openCell)) continue; // Если клетку не получилось открыть - начать сначала
+
+                OpenedCells++;
                 
                 if (openCell.AdjacentMinesCount == 0) // Если у клетки нет соседей-мин, то...
                 {
@@ -251,10 +257,7 @@
                 }
             }
         }
+        
+        
     }
 }
-// Добавить проверку для счетчика соседних мин - если клетка находится у края, то проверять все 8 клеток вокруг нее не нужно
-// Дополнение по UX: включить startedCell в «запретную зону»
-// Сейчас мина не ставится только на первую клетку, но не исключается, что рядом всё заминировано, и у игрока будет автопоражение на 2 - 3 ходу
-// Позже можешь расширить:
-// Генерация мин с исключением startedCell и всех её соседей
