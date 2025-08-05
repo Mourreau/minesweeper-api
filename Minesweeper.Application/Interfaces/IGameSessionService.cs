@@ -4,7 +4,7 @@ namespace Minesweeper.Application.Interfaces;
 
 public interface IGameSessionService
 {
-    public Guid CreateNewGame(Game game);
+    public Guid StoreNewGame(Game game);
     public bool TryGetGame(Guid id,  out Game game);
     public bool RemoveGame(Guid id);
 }
