@@ -12,12 +12,12 @@ namespace Minesweeper.Core.Models
         /// <summary>
         /// Ширина игрового поля (X) определяется размерами двумерного массива GameBoard
         /// </summary>
-        private int Width => GameBoard.GetLength(0);
+        public int Width => GameBoard.GetLength(0);
 
         /// <summary>
         /// Высота игрового поля (Y) определяется размерами двумерного массива GameBoard
         /// </summary>
-        private int Height => GameBoard.GetLength(1);
+        public int Height => GameBoard.GetLength(1);
 
         public int OpenedCells { get; private set; }
         
