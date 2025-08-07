@@ -14,6 +14,7 @@ public static class SetupConfig
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<IGameSessionService, GameSessionService>();
+        builder.Services.AddScoped<IGameManagerService, GameManagerService>();
     }
 
     public static void ConfigureMiddleware(this WebApplication app)
