@@ -14,13 +14,13 @@ public class GameSessionService : IGameSessionService
     /// <param name="game">Игра, которую требуется добавить в хранилище.</param>
     /// <returns>Id добавленной игры.</returns>
     /// <exception cref="Exception">Failed to store the new game session.</exception>
-    public Guid StoreNewGame(Game game)
+    public bool StoreNewGame(Game game, out Guid gameId)
     {
-        var gameId = Guid.NewGuid();
+        gameId = Guid.NewGuid();
         if (!_gameVault.TryAdd(gameId, game))
-            throw new Exception("Failed to store the new game session.");
+            return false;
         
-        return gameId;
+        return true;
     }
 
     /// <summary>
