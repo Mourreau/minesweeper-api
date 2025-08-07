@@ -24,14 +24,14 @@ public class GameManagerService : IGameManagerService
         var settings = GameSettings.Create(presetRequest.Difficulty);
         Game newGame = new Game(settings);
 
-        if (!_gameSessionService.StoreNewGame(newGame, out var id))
+        if (!_gameSessionService.StoreNewGame(newGame, out var gameId))
         {
-            _logger.LogWarning("Failed to store new game. Difficulty: {Difficulty}, Game Id: {id}", settings.Difficulty, id);
+            _logger.LogWarning("Failed to store new game. Difficulty: {Difficulty}, Game Id: {GameId}", settings.Difficulty, gameId);
             return Result.Fail("Cannot create new game");
         }
         
         
-        return Result.Ok(id);
+        return Result.Ok(gameId);
     }
     
 }
