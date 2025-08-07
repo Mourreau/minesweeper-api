@@ -1,4 +1,5 @@
 using Minesweeper.Application.Interfaces;
+using Minesweeper.Application.Mappers;
 using Minesweeper.Application.Services;
 
 namespace Minesweeper.Presentation.Setup;
@@ -15,6 +16,7 @@ public static class SetupConfig
     {
         builder.Services.AddSingleton<IGameSessionService, GameSessionService>();
         builder.Services.AddScoped<IGameManagerService, GameManagerService>();
+        builder.Services.AddTransient<GameStateDtoMapper>();
     }
 
     public static void ConfigureMiddleware(this WebApplication app)
