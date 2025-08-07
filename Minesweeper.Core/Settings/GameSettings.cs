@@ -4,6 +4,13 @@ namespace Minesweeper.Core.Settings
 {
     public class GameSettings
     {
+
+        public int BoardWidth { get; init; }
+        public int BoardHeight { get; init; }
+        public int MinesCount { get; init; }
+        public GameDifficulty Difficulty { get; init; } = GameDifficulty.Easy; // Уровень сложности по умолчанию
+        
+        
         public GameSettings(int boardWidth, int boardHeight, int minesCount, GameDifficulty difficulty)
         {
             BoardWidth = boardWidth;
@@ -11,11 +18,6 @@ namespace Minesweeper.Core.Settings
             MinesCount = minesCount;
             Difficulty = difficulty;
         }
-
-        public int BoardWidth { get; init; }
-        public int BoardHeight { get; init; }
-        public int MinesCount { get; init; }
-        public GameDifficulty Difficulty { get; init; } = GameDifficulty.Easy; // Уровень сложности по умолчанию
 
 
 
