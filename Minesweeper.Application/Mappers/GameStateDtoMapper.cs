@@ -7,12 +7,9 @@ namespace Minesweeper.Application.Mappers;
 
 public class GameStateDtoMapper(IGameSessionService gameSessionService)
 {
-    private readonly IGameSessionService _gameSessionService = gameSessionService;
-
-
     public Result<GameStateDto> MapGameStateDto(Guid gameId)
     {
-        if (!_gameSessionService.TryGetGame(gameId, out var currentGame))
+        if (!gameSessionService.TryGetGame(gameId, out var currentGame))
             return Result.Fail("Game not found");
 
         var gameState = new GameStateDto
@@ -24,6 +21,20 @@ public class GameStateDtoMapper(IGameSessionService gameSessionService)
         };
 
         return Result.Ok(gameState);
+    }
+    
+    public GameStateDto MapGameStateDto(Game game)
+    {
+
+        var gameState = new GameStateDto
+        {
+            GameStatus = game.CurrentGameStatus.ToString(),
+            GameBoard = MapGameBoard(game),
+            Width = game.GameBoard.Width,
+            Height = game.GameBoard.Height
+        };
+
+        return gameState;
     }
 
     private List<List<CellDto>> MapGameBoard(Game game)
