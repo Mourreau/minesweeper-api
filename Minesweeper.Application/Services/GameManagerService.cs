@@ -45,8 +45,11 @@ public class GameManagerService : IGameManagerService
 
     public Result<GameStateDto> RevealCell(Guid gameId, CellPositionDto cellPositionDto)
     {
-        if (!_gameSessionService.TryGetGame(gameId, out var game))
-            return Result.Fail(NotFoundError.GameNotFound(gameId));
+        var fetchResult = GetGameSession(gameId);
+        
+        if (fetchResult.IsFailed) return Result.Fail(fetchResult.Errors);
+        
+        var game = fetchResult.Value;    
 
         if (IsGameOver()) return FailGameOver();
         if (IsNewGame()) StartGame();
@@ -82,9 +85,17 @@ public class GameManagerService : IGameManagerService
             return game.CurrentGameStatus is GameStatus.Loose or GameStatus.Win;
         }
     }
+    
+
+    private Result<Game> GetGameSession(Guid gameId)
+    {
+        return _gameSessionService.TryGetGame(gameId,  out var game)
+            ? Result.Ok(game)
+            : Result.Fail(NotFoundError.GameNotFound(gameId));
+    }
 
 
-    public Result<GameStateDto> ToggleFlags(Guid gameId, CellPositionDto cellPositionDto)
+    public Result<GameStateDto> ToggleFlag(Guid gameId, CellPositionDto cellPositionDto)
     {
         throw new NotImplementedException();
     }
