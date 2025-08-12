@@ -14,20 +14,17 @@ public static class ResultExtensions
 
         var error = result.Errors.First();
 
-        switch (error)
+        return error switch
         {
-            case NotFoundError: return controller.NotFound(error.Message);
-            case GameOverError: return controller.BadRequest(error.Message);
-            case InvalidCoordinatesError: return controller.BadRequest(error.Message);
-            case AlreadyRevealedError: return controller.StatusCode(100, error.Message);
-            default: controller.StatusCode(500, error.Message);
-                break;
-        }
-
-        return controller.StatusCode(500, error.Message);
+            NotFoundError => controller.NotFound(error.Message),
+            GameOverError => controller.BadRequest(error.Message),
+            InvalidCoordinatesError => controller.BadRequest(error.Message),
+            AlreadyRevealedError => controller.Ok(error.Message),
+            _ => controller.StatusCode(500, error.Message)
+        };
     }
-    
-    
+
+
     public static IActionResult ToActionResult(this ControllerBase controller, Result result)
     {
         if (result.IsSuccess)
@@ -35,16 +32,13 @@ public static class ResultExtensions
 
         var error = result.Errors.First();
 
-        switch (error)
+        return error switch
         {
-            case NotFoundError: return controller.NotFound(error.Message);
-            case GameOverError: return controller.BadRequest(error.Message);
-            case InvalidCoordinatesError: return controller.BadRequest(error.Message);
-            case AlreadyRevealedError: return controller.StatusCode(100, error.Message);
-            default: controller.StatusCode(500, error.Message);
-                break;
-        }
-
-        return controller.StatusCode(500, error.Message);
+            NotFoundError => controller.NotFound(error.Message),
+            GameOverError => controller.BadRequest(error.Message),
+            InvalidCoordinatesError => controller.BadRequest(error.Message),
+            AlreadyRevealedError => controller.Ok(error.Message),
+            _ => controller.StatusCode(500, error.Message)
+        };
     }
 }
