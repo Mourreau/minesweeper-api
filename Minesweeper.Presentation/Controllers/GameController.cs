@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Minesweeper.Application.DTO;
 using Minesweeper.Application.Interfaces;
 using Minesweeper.Application.Mappers;
+using Minesweeper.Presentation.Infrastructure.ResultMapping;
 
 namespace Minesweeper.Presentation.Controllers;
 
@@ -35,6 +36,14 @@ public class GameController : ControllerBase
             return BadRequest(result.Errors);
 
         return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, null);
+    }
+
+    [HttpPost("{id:guid}/reveal")]
+    public IActionResult RevealCell([FromRoute] Guid id, [FromBody] CellPositionDto positionDto)
+    {
+        var result = _gameManagerService.RevealCell(id, positionDto);
+        
+        return this.ToActionResult(result);
     }
 
     [HttpGet("{id:guid}")]
