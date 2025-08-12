@@ -6,7 +6,7 @@ using Minesweeper.Application.Mappers;
 namespace Minesweeper.Presentation.Controllers;
 
 [ApiController]
-[Route("game")]
+[Route("game/minesweeper")]
 public class GameController : ControllerBase
 {
     private readonly ILogger<GameController> _logger;
@@ -26,7 +26,7 @@ public class GameController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpPost]
+    [HttpPost("new")]
     public IActionResult CreateNewGame([FromBody] NewGamePresetRequest request)
     {
         var result = _gameManagerService.CreateNewGame(request);
@@ -38,13 +38,20 @@ public class GameController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GameStateDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetGameById(Guid id)
     {
         var result = _mapper.MapGameStateDto(id);
 
         if (result.IsFailed)
+        {
+            _logger.LogWarning("Game with ID {id} is not found", id);
             return NotFound(result.Errors);
+        }
 
+        _logger.LogInformation("Game created with ID {Id}", id);
         return Ok(result.Value);
     }
 }
