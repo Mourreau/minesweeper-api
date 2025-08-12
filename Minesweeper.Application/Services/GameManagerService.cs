@@ -47,11 +47,11 @@ public class GameManagerService : IGameManagerService
     {
         var fetchResult = GetGameSession(gameId);
         
-        if (fetchResult.IsFailed) return Result.Fail(fetchResult.Errors);
+        if (fetchResult.IsFailed) return Result.Fail(NotFoundError.GameNotFound(gameId));
         
         var game = fetchResult.Value;    
 
-        if (IsGameOver()) return FailGameOver();
+        if (IsGameOver(game)) return Result.Fail(GameOverError.GameOver(game));
         if (IsNewGame()) StartGame();
         else MakeMove();
 
@@ -64,12 +64,6 @@ public class GameManagerService : IGameManagerService
             game.RevealCell(cellPositionDto.X, cellPositionDto.Y);
         }
 
-        Result FailGameOver()
-        {
-            return Result.Fail(GameOverError.GameOver(game));
-        }
-
-
         bool IsNewGame()
         {
             return game.CurrentGameStatus is GameStatus.Created;
@@ -79,13 +73,27 @@ public class GameManagerService : IGameManagerService
         {
             game.StartGame(cellPositionDto.X, cellPositionDto.Y);
         }
-
-        bool IsGameOver()
-        {
-            return game.CurrentGameStatus is GameStatus.Loose or GameStatus.Win;
-        }
     }
-    
+
+    private bool IsGameOver(Game game)
+    {
+        return game.CurrentGameStatus is GameStatus.Loose or GameStatus.Win;
+    }
+
+    public Result<GameStateDto> ToggleFlag(Guid gameId, CellPositionDto cellPositionDto)
+    {
+        var fetchResult = GetGameSession(gameId);
+        
+        if (fetchResult.IsFailed) return Result.Fail(NotFoundError.GameNotFound(gameId));
+        
+        var game = fetchResult.Value;    
+        
+        if (IsGameOver(game)) return Result.Fail(GameOverError.GameOver(game));
+        
+        game.ToggleFlag(cellPositionDto.X, cellPositionDto.Y);
+        
+        return Result.Ok(_mapper.MapGameStateDto(game));
+    }
 
     private Result<Game> GetGameSession(Guid gameId)
     {
@@ -95,8 +103,4 @@ public class GameManagerService : IGameManagerService
     }
 
 
-    public Result<GameStateDto> ToggleFlag(Guid gameId, CellPositionDto cellPositionDto)
-    {
-        throw new NotImplementedException();
-    }
 }
