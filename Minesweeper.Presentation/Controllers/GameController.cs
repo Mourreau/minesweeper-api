@@ -7,7 +7,7 @@ using Minesweeper.Presentation.Infrastructure.ResultMapping;
 namespace Minesweeper.Presentation.Controllers;
 
 [ApiController]
-[Route("game/minesweeper")]
+[Route("games/minesweeper")]
 public class GameController : ControllerBase
 {
     private readonly ILogger<GameController> _logger;
@@ -27,7 +27,7 @@ public class GameController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpPost("new")]
+    [HttpPost]
     public IActionResult CreateNewGame([FromBody] NewGamePresetRequest request)
     {
         var result = _gameManagerService.CreateNewGame(request);
@@ -38,7 +38,7 @@ public class GameController : ControllerBase
         return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, null);
     }
 
-    [HttpPost("{id:guid}/reveal")]
+    [HttpPatch("{id:guid}/reveal")]
     public IActionResult RevealCell([FromRoute] Guid id, [FromBody] CellPositionDto positionDto)
     {
         var result = _gameManagerService.RevealCell(id, positionDto);
