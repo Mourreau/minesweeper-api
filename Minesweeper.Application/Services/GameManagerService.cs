@@ -46,10 +46,10 @@ public class GameManagerService : IGameManagerService
     public Result<GameStateDto> RevealCell(Guid gameId, CellPositionDto cellPositionDto)
     {
         var fetchResult = GetGameSession(gameId);
-        
+
         if (fetchResult.IsFailed) return Result.Fail(NotFoundError.GameNotFound(gameId));
-        
-        var game = fetchResult.Value;    
+
+        var game = fetchResult.Value;
 
         if (IsGameOver(game)) return Result.Fail(GameOverError.GameOver(game));
         if (IsNewGame()) StartGame();
@@ -57,7 +57,6 @@ public class GameManagerService : IGameManagerService
 
         return Result.Ok(_mapper.MapGameStateDto(game));
 
-        
 
         void MakeMove()
         {
@@ -83,24 +82,22 @@ public class GameManagerService : IGameManagerService
     public Result<GameStateDto> ToggleFlag(Guid gameId, CellPositionDto cellPositionDto)
     {
         var fetchResult = GetGameSession(gameId);
-        
+
         if (fetchResult.IsFailed) return Result.Fail(NotFoundError.GameNotFound(gameId));
-        
-        var game = fetchResult.Value;    
-        
+
+        var game = fetchResult.Value;
+
         if (IsGameOver(game)) return Result.Fail(GameOverError.GameOver(game));
-        
+
         game.ToggleFlag(cellPositionDto.X, cellPositionDto.Y);
-        
+
         return Result.Ok(_mapper.MapGameStateDto(game));
     }
 
-    private Result<Game> GetGameSession(Guid gameId)
+    public Result<Game> GetGameSession(Guid gameId)
     {
-        return _gameSessionService.TryGetGame(gameId,  out var game)
+        return _gameSessionService.TryGetGame(gameId, out var game)
             ? Result.Ok(game)
             : Result.Fail(NotFoundError.GameNotFound(gameId));
     }
-
-
 }
