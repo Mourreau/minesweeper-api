@@ -40,6 +40,13 @@ public class GameController : ControllerBase
         return this.ToActionResult(result);
     }
 
+    [HttpPatch("{id:guid}/toggle-flag")]
+    public IActionResult ToggleFlag([FromRoute] Guid id, [FromBody] CellPositionDto positionDto)
+    {
+        var result = _gameManagerService.ToggleFlag(id,  positionDto);
+        return this.ToActionResult(result);
+    }
+
     [HttpGet("{id:guid}")]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GameStateDto))]
