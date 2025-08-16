@@ -11,20 +11,14 @@ namespace Minesweeper.Presentation.Controllers;
 public class GameController : ControllerBase
 {
     private readonly ILogger<GameController> _logger;
-    private readonly IGameSessionService _gameSessionService;
     private readonly IGameManagerService _gameManagerService;
-    private readonly GameStateDtoMapper _mapper;
 
     public GameController(
         ILogger<GameController> logger,
-        IGameSessionService gameSessionService,
-        IGameManagerService gameManagerService,
-        GameStateDtoMapper mapper)
+        IGameManagerService gameManagerService)
     {
         _logger = logger;
-        _gameSessionService = gameSessionService;
         _gameManagerService = gameManagerService;
-        _mapper = mapper;
     }
 
     [HttpPost]
@@ -52,7 +46,7 @@ public class GameController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetGameById(Guid id)
     {
-        var result = _mapper.MapGameStateDto(id);
+        var result = _gameManagerService.GetGameSession(id);
 
         if (result.IsFailed)
         {
