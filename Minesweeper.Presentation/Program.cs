@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.ConfigureDependencies();
+builder.RegisterServices();
 
 var app = builder.Build();
 
@@ -11,3 +12,6 @@ var app = builder.Build();
 app.ConfigureMiddleware();
 
 app.Run();
+
+
+public partial class Program { } // Маячок для тестов.
