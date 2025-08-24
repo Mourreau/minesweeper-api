@@ -22,28 +22,29 @@ public class GameController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult CreateNewGame([FromBody] NewGamePresetRequest request)
+    public async Task<IActionResult> CreateNewGame([FromBody] NewGamePresetRequest request, CancellationToken ct)
     {
-        var result = _gameManagerService.CreateNewGame(request);
+        var result = await _gameManagerService.CreateNewGame(request, ct);
 
         if (result.IsFailed)
             return BadRequest(result.Errors);
 
+        //TODO: Возможно стоит возвращать GameStateDto вместо null.
         return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, null);
     }
 
     [HttpPatch("{id:guid}/reveal")]
-    public IActionResult RevealCell([FromRoute] Guid id, [FromBody] CellPositionDto positionDto)
+    public async Task<IActionResult> RevealCell([FromRoute] Guid id, [FromBody] CellPositionDto positionDto, CancellationToken ct)
     {
-        var result = _gameManagerService.RevealCell(id, positionDto);
+        var result = await _gameManagerService.RevealCell(id, positionDto, ct);
         
         return this.ToActionResult(result);
     }
 
     [HttpPatch("{id:guid}/toggle-flag")]
-    public IActionResult ToggleFlag([FromRoute] Guid id, [FromBody] CellPositionDto positionDto)
+    public async Task<IActionResult> ToggleFlag([FromRoute] Guid id, [FromBody] CellPositionDto positionDto, CancellationToken ct)
     {
-        var result = _gameManagerService.ToggleFlag(id,  positionDto);
+        var result = await _gameManagerService.ToggleFlag(id,  positionDto, ct);
         return this.ToActionResult(result);
     }
 
@@ -51,9 +52,11 @@ public class GameController : ControllerBase
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GameStateDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetGameById(Guid id)
+    public async Task<IActionResult> GetGameById(Guid id, CancellationToken ct)
     {
-        var result = _gameManagerService.GetGameSession(id);
+        //TODO: Мне разве нужно здесь возвращать Game, а не GameStateDto?
+        
+        var result = await _gameManagerService.GetGameSession(id, ct);
 
         if (result.IsFailed)
         {
@@ -61,7 +64,7 @@ public class GameController : ControllerBase
             return NotFound(result.Errors);
         }
 
-        _logger.LogInformation("Game created with ID {Id}", id);
-        return Ok(result.Value);
+        _logger.LogInformation("Game was received with ID {Id}", id);
+        return Ok(result);
     }
 }
