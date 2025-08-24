@@ -27,31 +27,32 @@ public class GameManagerService : IGameManagerService
     }
 
 
-    public Result<Guid> CreateNewGame(NewGamePresetRequest presetRequest)
+    public Task<Result<Guid>> CreateNewGame(NewGamePresetRequest presetRequest, CancellationToken ct)
     {
         var settings = GameSettings.Create(presetRequest.Difficulty);
-        Game newGame = new Game(settings);
+        var newGame = new Game(settings);
 
         if (!_gameSessionService.StoreNewGame(newGame, out var gameId))
         {
             _logger.LogWarning("Failed to store new game. Difficulty: {Difficulty}, Game Id: {GameId}",
                 settings.Difficulty, gameId);
-            return Result.Fail("Cannot create new game");
+            return Task.FromResult(Result.Fail<Guid>("Cannot create new game"));
         }
 
 
-        return Result.Ok(gameId);
+        return Task.FromResult(Result.Ok(gameId));
     }
 
-    public Result<GameStateDto> RevealCell(Guid gameId, CellPositionDto cellPositionDto)
+    public async Task<Result<GameStateDto>> RevealCell(Guid gameId, CellPositionDto cellPositionDto, CancellationToken ct)
     {
-        var fetchResult = GetGameSession(gameId);
-
-        if (fetchResult.IsFailed) return Result.Fail(NotFoundError.GameNotFound(gameId));
+        var fetchResult = await GetGameSession(gameId, ct);
+        
+        if (fetchResult.IsFailed) 
+            return Result.Fail<GameStateDto>(NotFoundError.GameNotFound(gameId));
 
         var game = fetchResult.Value;
 
-        if (IsGameOver(game)) return Result.Fail(GameOverError.GameOver(game));
+        if (IsGameOver(game)) return Result.Fail<GameStateDto>(GameOverError.GameOver(game));
         if (IsNewGame()) StartGame();
         else MakeMove();
 
@@ -73,31 +74,33 @@ public class GameManagerService : IGameManagerService
             game.StartGame(cellPositionDto.X, cellPositionDto.Y);
         }
     }
+    
 
-    private bool IsGameOver(Game game)
+    public async Task<Result<GameStateDto>> ToggleFlag(Guid gameId, CellPositionDto cellPositionDto, CancellationToken ct)
     {
-        return game.CurrentGameStatus is GameStatus.Loose or GameStatus.Win;
-    }
+        var fetchResult = await GetGameSession(gameId, ct);
 
-    public Result<GameStateDto> ToggleFlag(Guid gameId, CellPositionDto cellPositionDto)
-    {
-        var fetchResult = GetGameSession(gameId);
-
-        if (fetchResult.IsFailed) return Result.Fail(NotFoundError.GameNotFound(gameId));
+        if (fetchResult.IsFailed) 
+            return Result.Fail<GameStateDto>(NotFoundError.GameNotFound(gameId));
 
         var game = fetchResult.Value;
 
-        if (IsGameOver(game)) return Result.Fail(GameOverError.GameOver(game));
+        if (IsGameOver(game)) return Result.Fail<GameStateDto>(GameOverError.GameOver(game));
 
         game.ToggleFlag(cellPositionDto.X, cellPositionDto.Y);
 
         return Result.Ok(_mapper.MapGameStateDto(game));
     }
 
-    public Result<Game> GetGameSession(Guid gameId)
+    public Task<Result<Game>> GetGameSession(Guid gameId, CancellationToken ct)
     {
         return _gameSessionService.TryGetGame(gameId, out var game)
-            ? Result.Ok(game)
-            : Result.Fail(NotFoundError.GameNotFound(gameId));
+            ? Task.FromResult(Result.Ok(game))
+            : Task.FromResult(Result.Fail<Game>(NotFoundError.GameNotFound(gameId)));
+    }
+    
+    private static bool IsGameOver(Game game)
+    {
+        return game.CurrentGameStatus is GameStatus.Loose or GameStatus.Win;
     }
 }
