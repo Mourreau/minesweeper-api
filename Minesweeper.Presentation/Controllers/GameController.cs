@@ -21,10 +21,11 @@ public class GameController : ControllerBase
         _gameManagerService = gameManagerService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateNewGame([FromBody] NewGamePresetRequest request, CancellationToken ct)
+    [HttpPost("preset")]
+    public async Task<IActionResult> CreateNewGameByPreset([FromBody] NewGamePresetRequest request, CancellationToken ct)
     {
         var result = await _gameManagerService.CreateNewGame(request, ct);
+    [HttpPost("custom")]
 
         if (result.IsFailed)
             return BadRequest(result.Errors);
