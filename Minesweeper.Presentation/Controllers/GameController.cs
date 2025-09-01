@@ -24,8 +24,19 @@ public class GameController : ControllerBase
     [HttpPost("preset")]
     public async Task<IActionResult> CreateNewGameByPreset([FromBody] NewGamePresetRequest request, CancellationToken ct)
     {
-        var result = await _gameManagerService.CreateNewGame(request, ct);
+        var result = await _gameManagerService.CreateNewGameByPreset(request, ct);
+
+        if (result.IsFailed)
+            return BadRequest(result.Errors);
+
+        //TODO: Возможно стоит возвращать GameStateDto вместо null.
+        return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, null);
+    }
+    
     [HttpPost("custom")]
+    public async Task<IActionResult> CreateCustomNewGame([FromBody] CreateNewCustomGameRequest request, CancellationToken ct)
+    {
+        var result = await _gameManagerService.CreateCustomNewGame(request, ct);
 
         if (result.IsFailed)
             return BadRequest(result.Errors);
