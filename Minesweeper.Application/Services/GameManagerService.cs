@@ -27,7 +27,7 @@ public class GameManagerService : IGameManagerService
     }
 
 
-    public Task<Result<Guid>> CreateNewGame(NewGamePresetRequest presetRequest, CancellationToken ct)
+    public Task<Result<Guid>> CreateNewGameByPreset(NewGamePresetRequest presetRequest, CancellationToken ct)
     {
         var settings = GameSettings.Create(presetRequest.Difficulty);
         var newGame = new Game(settings);
@@ -40,6 +40,26 @@ public class GameManagerService : IGameManagerService
         }
 
 
+        return Task.FromResult(Result.Ok(gameId));
+    }
+
+    public Task<Result<Guid>> CreateCustomNewGame(CreateNewCustomGameRequest customRequest, CancellationToken ct)
+    {
+        var settings = GameSettings.Create(
+            customRequest.Difficulty,
+            customRequest.BoardWidth,
+            customRequest.BoardHeight,
+            customRequest.MinesCount);
+        
+        var newGame = new Game(settings);
+        
+        if (!_gameSessionService.StoreNewGame(newGame, out var gameId))
+        {
+            _logger.LogWarning("Failed to store new game. Difficulty: {Difficulty}, Game Id: {GameId}",
+                settings.Difficulty, gameId);
+            return Task.FromResult(Result.Fail<Guid>("Cannot create new game"));
+        }
+        
         return Task.FromResult(Result.Ok(gameId));
     }
 
