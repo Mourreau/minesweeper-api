@@ -20,8 +20,7 @@ namespace Minesweeper.Core.Models
 
         public Game(GameSettings settings)
         {
-            if (settings is null) throw new ArgumentNullException(nameof(settings), "Game settings cannot be null.");
-            Settings = settings;
+            Settings = settings ?? throw new ArgumentNullException(nameof(settings), "Game settings cannot be null.");
             GameBoard = new Board(settings.BoardWidth, settings.BoardHeight);
             _notMinesCellsCount = GameBoard.GameBoard.Length - Settings.MinesCount;
             CurrentGameStatus = GameStatus.Created;
