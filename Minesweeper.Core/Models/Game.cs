@@ -48,7 +48,7 @@ namespace Minesweeper.Core.Models
         /// </summary>
         public void TogglePauseGame()
         {
-            if (CurrentGameStatus is GameStatus.Loose or GameStatus.Win)
+            if (CurrentGameStatus is GameStatus.Lost or GameStatus.Won)
                 return; // Если игра уже завершена, то она не может быть поставлена на паузу.
 
             CurrentGameStatus =
@@ -64,7 +64,7 @@ namespace Minesweeper.Core.Models
             if (cell.IsMine)
             {
                 RevealAllMines();
-                CurrentGameStatus = GameStatus.Loose;
+                CurrentGameStatus = GameStatus.Lost;
                 return;
             }
 
@@ -87,7 +87,7 @@ namespace Minesweeper.Core.Models
         public void CheckWin()
         {
             if (GameBoard.OpenedCells == _notMinesCellsCount && CurrentGameStatus == GameStatus.InProgress)
-                CurrentGameStatus = GameStatus.Win;
+                CurrentGameStatus = GameStatus.Won;
         }
 
         public void ToggleFlag(int x, int y)
