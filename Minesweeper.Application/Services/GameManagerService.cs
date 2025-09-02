@@ -119,7 +119,16 @@ public class GameManagerService : IGameManagerService
             ? Task.FromResult(Result.Ok(game))
             : Task.FromResult(Result.Fail<Game>(NotFoundError.GameNotFound(gameId)));
     }
-    
+
+    public Task<Result<GameStateDto>> GetGameState(Guid gameId, CancellationToken ct)
+    {
+        var state = _mapper.MapGameStateDto(gameId);
+        
+        if (state.IsFailed) return Task.FromResult(Result.Fail<GameStateDto>(NotFoundError.GameNotFound(gameId)));
+        
+        return Task.FromResult(state);
+    }
+
     private static bool IsGameOver(Game game)
     {
         return game.CurrentGameStatus is GameStatus.Lost or GameStatus.Won;
