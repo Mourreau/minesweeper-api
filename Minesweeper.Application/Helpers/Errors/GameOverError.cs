@@ -8,7 +8,7 @@ public class GameOverError(string message) : AppErrorBase(AppErrorCode.GameOver,
 {
     public static GameOverError GameOver(Game game)
         => new($"Game over. Player {(
-            game.CurrentGameStatus == GameStatus.Win
+            game.CurrentGameStatus == GameStatus.Won
                 ? "won"
                 : "lost")}");
 }
