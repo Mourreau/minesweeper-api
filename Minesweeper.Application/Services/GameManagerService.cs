@@ -121,6 +121,6 @@ public class GameManagerService : IGameManagerService
     
     private static bool IsGameOver(Game game)
     {
-        return game.CurrentGameStatus is GameStatus.Loose or GameStatus.Win;
+        return game.CurrentGameStatus is GameStatus.Lost or GameStatus.Won;
     }
 }

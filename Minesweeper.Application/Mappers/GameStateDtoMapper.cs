@@ -1,6 +1,7 @@
 using FluentResults;
 using Minesweeper.Application.DTO;
 using Minesweeper.Application.Interfaces;
+using Minesweeper.Core.Enums;
 using Minesweeper.Core.Models;
 
 namespace Minesweeper.Application.Mappers;
@@ -40,6 +41,8 @@ public class GameStateDtoMapper(IGameSessionService gameSessionService)
     private List<List<CellDto>> MapGameBoard(Game game)
     {
         var boardDto = new List<List<CellDto>>();
+
+        bool showAllMines = game.CurrentGameStatus is GameStatus.Won or GameStatus.Lost;
 
         for (int y = 0; y < game.GameBoard.Height; y++)
         {
