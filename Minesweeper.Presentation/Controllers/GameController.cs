@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Minesweeper.Application.DTO;
 using Minesweeper.Application.Interfaces;
-using Minesweeper.Application.Mappers;
 using Minesweeper.Presentation.Infrastructure.ResultMapping;
 
 namespace Minesweeper.Presentation.Controllers;
@@ -28,9 +27,14 @@ public class GameController : ControllerBase
 
         if (result.IsFailed)
             return BadRequest(result.Errors);
+        
+        // Получаем состояние игры - GameStateDto.
+        var state = await _gameManagerService.GetGameState(result.Value, ct);
+        
+        if (state.IsFailed)
+            return BadRequest(state.Errors);
 
-        //TODO: Возможно стоит возвращать GameStateDto вместо null.
-        return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, null);
+        return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, state.Value);
     }
     
     [HttpPost("custom")]
@@ -40,9 +44,14 @@ public class GameController : ControllerBase
 
         if (result.IsFailed)
             return BadRequest(result.Errors);
+ 
+        // Получаем состояние игры - GameStateDto.
+        var state = await _gameManagerService.GetGameState(result.Value, ct);
+        
+        if (state.IsFailed)
+            return BadRequest(state.Errors);
 
-        //TODO: Возможно стоит возвращать GameStateDto вместо null.
-        return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, null);
+        return CreatedAtAction(nameof(GetGameById), new { id = result.Value }, state.Value);
     }
 
     [HttpPatch("{id:guid}/reveal")]
@@ -66,9 +75,8 @@ public class GameController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetGameById(Guid id, CancellationToken ct)
     {
-        //TODO: Мне разве нужно здесь возвращать Game, а не GameStateDto?
         
-        var result = await _gameManagerService.GetGameSession(id, ct);
+        var result = await _gameManagerService.GetGameState(id, ct);
 
         if (result.IsFailed)
         {
@@ -77,6 +85,6 @@ public class GameController : ControllerBase
         }
 
         _logger.LogInformation("Game was received with ID {Id}", id);
-        return Ok(result);
+        return Ok(result.Value);
     }
 }
