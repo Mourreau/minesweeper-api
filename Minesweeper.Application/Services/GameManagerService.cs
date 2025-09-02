@@ -76,7 +76,7 @@ public class GameManagerService : IGameManagerService
         if (IsNewGame()) StartGame();
         else MakeMove();
 
-        return Result.Ok(_mapper.MapGameStateDto(game));
+        return Result.Ok(_mapper.MapGameStateDto(game, gameId));
 
 
         void MakeMove()
@@ -109,8 +109,9 @@ public class GameManagerService : IGameManagerService
 
         game.ToggleFlag(cellPositionDto.X, cellPositionDto.Y);
 
-        return Result.Ok(_mapper.MapGameStateDto(game));
+        return Result.Ok(_mapper.MapGameStateDto(game, gameId));
     }
+    
 
     public Task<Result<Game>> GetGameSession(Guid gameId, CancellationToken ct)
     {
