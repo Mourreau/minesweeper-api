@@ -15,6 +15,7 @@ public class GameStateDtoMapper(IGameSessionService gameSessionService)
 
         var gameState = new GameStateDto
         {
+            Id = gameId,
             GameStatus = currentGame.CurrentGameStatus.ToString(),
             GameBoard = MapGameBoard(currentGame),
             Width = currentGame.GameBoard.Width,
@@ -24,11 +25,12 @@ public class GameStateDtoMapper(IGameSessionService gameSessionService)
         return Result.Ok(gameState);
     }
     
-    public GameStateDto MapGameStateDto(Game game)
+    public GameStateDto MapGameStateDto(Game game, Guid gameId)
     {
 
         var gameState = new GameStateDto
         {
+            Id = gameId,
             GameStatus = game.CurrentGameStatus.ToString(),
             GameBoard = MapGameBoard(game),
             Width = game.GameBoard.Width,
