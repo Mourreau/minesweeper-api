@@ -11,4 +11,5 @@ public interface IGameManagerService
     Task<Result<GameStateDto>> RevealCell(Guid gameId, CellPositionDto cellPositionDto, CancellationToken ct);
     Task<Result<GameStateDto>> ToggleFlag(Guid gameId, CellPositionDto cellPositionDto, CancellationToken ct);
     Task<Result<Game>> GetGameSession(Guid gameId, CancellationToken ct);
+    Task<Result<GameStateDto>> GetGameState(Guid gameId, CancellationToken ct);
 }
