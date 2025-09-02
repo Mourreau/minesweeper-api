@@ -62,7 +62,10 @@ public class GameStateDtoMapper(IGameSessionService gameSessionService)
                     AdjacentMinesCount =
                         cell.IsRevealed
                             ? cell.AdjacentMinesCount
-                            : null
+                            : null,
+                    IsMine = (showAllMines && cell.IsMine) ||
+                             (cell.IsRevealed && cell.IsMine)
+                             ? true : (bool?)null
                 };
                 row.Add(cellDto);
             }
