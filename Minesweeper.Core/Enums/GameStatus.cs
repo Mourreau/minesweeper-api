@@ -11,7 +11,7 @@ namespace Minesweeper.Core.Enums
         Created, // Игра создана, но не начата
         InProgress, // Игра в процессе
         Paused, // Игра приостановлена
-        Win, // Игра выиграна
-        Loose // Игра проиграна
+        Won, // Игра выиграна
+        Lost // Игра проиграна
     }
 }
