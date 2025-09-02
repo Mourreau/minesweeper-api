@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Minesweeper.Application.Interfaces;
 using Minesweeper.Application.Mappers;
 using Minesweeper.Application.Services;
@@ -18,7 +19,20 @@ public static class SetupConfig
         builder.Services.AddScoped<IGameManagerService, GameManagerService>();
         builder.Services.AddTransient<GameStateDtoMapper>();
         builder.Services.AddAuthorization();
-        builder.Services.AddControllers();
+        
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins("http://localhost:5173") // адрес фронта
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+        
+        builder.Services.AddControllers()
+            .AddJsonOptions(o =>
+                o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     }
 
     public static void ConfigureMiddleware(this WebApplication app)
@@ -30,6 +44,7 @@ public static class SetupConfig
         }
 
         app.UseHttpsRedirection();
+        app.UseCors();
         app.UseAuthorization();
         app.MapControllers();
     }
