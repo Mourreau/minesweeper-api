@@ -19,7 +19,7 @@ public class GameController : ControllerBase
         _logger = logger;
         _gameManagerService = gameManagerService;
     }
-
+    
     [HttpPost("preset")]
     public async Task<IActionResult> CreateNewGameByPreset([FromBody] NewGamePresetRequest request, CancellationToken ct)
     {

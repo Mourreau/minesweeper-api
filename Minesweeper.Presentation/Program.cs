@@ -2,6 +2,7 @@ using Minesweeper.Presentation.Setup;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.ConfigureDependencies();
 builder.RegisterServices();

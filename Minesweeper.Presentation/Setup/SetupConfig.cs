@@ -13,8 +13,12 @@ public static class SetupConfig
         builder.Services.AddSwaggerGen();
     }
 
+    
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
+        
+        var frontOrigin = builder.Configuration["AllowedCorsOrigin"] ?? "http://localhost:5173";
+        
         builder.Services.AddSingleton<IGameSessionService, GameSessionService>();
         builder.Services.AddScoped<IGameManagerService, GameManagerService>();
         builder.Services.AddTransient<GameStateDtoMapper>();
@@ -22,9 +26,9 @@ public static class SetupConfig
         
         builder.Services.AddCors(options =>
         {
-            options.AddDefaultPolicy(policy =>
+            options.AddPolicy("FrontOnly", policy =>
             {
-                policy.WithOrigins("http://localhost:5173") // адрес фронта
+                policy.WithOrigins(frontOrigin!)
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
@@ -44,7 +48,7 @@ public static class SetupConfig
         }
 
         app.UseHttpsRedirection();
-        app.UseCors();
+        app.UseCors("FrontOnly");
         app.UseAuthorization();
         app.MapControllers();
     }
