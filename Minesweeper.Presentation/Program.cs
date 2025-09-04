@@ -11,6 +11,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.ConfigureMiddleware();
 
+app.MapGet("/health", () => Results.Ok(new {status = "ok"}));
+
 app.Run();
 
 
